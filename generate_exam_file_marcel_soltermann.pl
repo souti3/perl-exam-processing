@@ -18,7 +18,7 @@ if ($numOfArguments != 1) {
 }
 
 # open a file for the output
-open (my $outputfh, ">>", "./doublicate.txt");
+open (my $outputfh, ">", "./test_data/doublicate.txt");
 
 my $inputFile = $ARGV[0];
 ##########################################################
@@ -40,6 +40,7 @@ die "File $inputFile has size zero!" if (! -s $inputFile);
 open (my $inputfh, $inputFile) or die $!;
 # read the file line by line
 while (my $nextline = readline($inputfh)) {
+  chomp $nextline;
   # check whether the next line is a correct answer
 
   # write the line in the output file

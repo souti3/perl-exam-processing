@@ -41,8 +41,11 @@ open (my $inputfh, $inputFile) or die $!;
 # read the file line by line
 while (my $nextline = readline($inputfh)) {
   chomp $nextline;
-  # check whether the next line is a correct answer
-
+  # leave the X in the example question
+  if ($nextline !~ m/This is the correct answer$/) {
+    # remove the X character from correct answers
+    $nextline =~ s/(\s+\[)X(\]\s.*)/$1 $2/;
+  }
   # write the line in the output file
   say {$outputfh} $nextline;
 }

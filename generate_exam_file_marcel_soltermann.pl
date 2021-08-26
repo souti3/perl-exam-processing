@@ -17,23 +17,35 @@ if ($numOfArguments != 1) {
   . qq{argument must be provided in order to execute this program.};
 }
 
-my $file = $ARGV[0];
+# open a file for the output
+open (my $outputfh, ">>", "./doublicate.txt");
+
+my $inputFile = $ARGV[0];
 ##########################################################
 # file tests with file test operators
 ##########################################################
 # make sure that the file exists
-die "File $file does not exists!" if (! -e $file);
+die "File $inputFile does not exists!" if (! -e $inputFile);
 # make sure that the file is readable
-die "File $file is not readable!" if (! -r $file);
+die "File $inputFile is not readable!" if (! -r $inputFile);
 # make sure that the file is an ASCII text file
-die "File $file is not an ASCII text file!" if (! -T $file);
+die "File $inputFile is not an ASCII text file!" if (! -T $inputFile);
 # make sure that the file is a plain file
-die "File $file is not a plain file!" if (! -f $file);
+die "File $inputFile is not a plain file!" if (! -f $inputFile);
 # make sure that the file is not empty
-die "File $file is empty!" if (-z $file);
+die "File $inputFile is empty!" if (-z $inputFile);
 # make sure that the file has nonzero size
-die "File $file has size zero!" if (! -s $file);
+die "File $inputFile has size zero!" if (! -s $inputFile);
 # open the provided examination master file
-open(my $fh, $file) or die $!;
-close $fh or die $!;
+open (my $inputfh, $inputFile) or die $!;
+# read the file line by line
+while (my $nextline = readline($inputfh)) {
+  # check whether the next line is a correct answer
+
+  # write the line in the output file
+  say {$outputfh} $nextline;
+}
+close $inputfh or die $!;
 say "Program works!";
+
+close $outputfh or die $!;

@@ -3,6 +3,8 @@ use strict; # optional as a specific version is provided
 use warnings;
 use diagnostics;
 
+use List::Util 'shuffle'; # needed to randomize the order of the answers
+
 ##########################################################
 # read the argument from command-line, verify that it is
 # a file and open it
@@ -43,6 +45,10 @@ while (my $nextline = readline($inputfh)) {
   chomp $nextline;
   # leave the X in the example question
   if ($nextline !~ m/This is the correct answer$/) {
+    # regex to match question lines
+    $matchQuestion =~ m/^\s*\d+\.\s*\w+./xms;
+    # regex to match answer lines
+    $matchAnswer =~ m/^\s*\[(?:\s+|X\s*)\]\s*.$/xms
     # remove the X character from correct answers
     $nextline =~ s/(\s+\[)X(\]\s.*)/$1 $2/;
   }
@@ -53,3 +59,6 @@ close $inputfh or die $!;
 say "Program works!";
 
 close $outputfh or die $!;
+
+# rendomize the order of the answers for each question
+@shuffled = shuffle(@list);

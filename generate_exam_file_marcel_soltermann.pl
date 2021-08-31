@@ -19,6 +19,9 @@ if ($numOfArguments != 1) {
   . qq{argument must be provided in order to execute this program.};
 }
 
+# array for the answers
+my @answers;
+
 # open a file for the output
 open (my $outputfh, ">", "./test_data/doublicate.txt");
 
@@ -45,20 +48,32 @@ while (my $nextline = readline($inputfh)) {
   chomp $nextline;
   # leave the X in the example question
   if ($nextline !~ m/This is the correct answer$/) {
-    # regex to match question lines
-    $matchQuestion =~ m/^\s*\d+\.\s*\w+./xms;
-    # regex to match answer lines
-    $matchAnswer =~ m/^\s*\[(?:\s+|X\s*)\]\s*.$/xms
+
     # remove the X character from correct answers
     $nextline =~ s/(\s+\[)X(\]\s.*)/$1 $2/;
+
   }
+  # regex to match question lines
+  #my $matchQuestion = qr{^\s*\d+\.\s*\w+.*}xms;
+  # regex to match answer lines
+  my $matchAnswer = qr{^\s*\[(?:\s+|X\s*)\]\s*.*$}xms;
+  # shuffle answers
+  if ($nextline =~ $matchAnswer){
+    push @answers, $nextline;
+  }
+
   # write the line in the output file
   say {$outputfh} $nextline;
 }
 close $inputfh or die $!;
 say "Program works!";
 
+say "The answer array contains the following:";
+for (@answers){
+  say $_;
+}
+
 close $outputfh or die $!;
 
 # rendomize the order of the answers for each question
-@shuffled = shuffle(@list);
+#@shuffled = shuffle(@answers);

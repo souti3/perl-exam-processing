@@ -5,6 +5,9 @@ use diagnostics;
 
 use List::Util 'shuffle'; # needed to randomize the order of the answers
 
+# Simplify the display of data structures...
+use Data::Dumper 'Dumper';
+
 ##########################################################
 # read the argument from command-line, verify that it is
 # a file and open it
@@ -21,9 +24,11 @@ if ($numOfArguments != 1) {
 
 # array for the answers
 my @answers;
+# hash for the questions
+my %questions;
 
 # open a file for the output
-open (my $outputfh, ">", "./test_data/doublicate.txt");
+#open (my $outputfh, ">", "./test_data/doublicate.txt");
 
 my $inputFile = $ARGV[0];
 ##########################################################
@@ -45,6 +50,7 @@ die "File $inputFile has size zero!" if (! -s $inputFile);
 open (my $inputfh, $inputFile) or die $!;
 # read the file line by line
 while (my $nextline = readline($inputfh)) {
+  state $currentQuestion = "Example how it works.";
   chomp $nextline;
   # leave the X in the example question
   if ($nextline !~ m/This is the correct answer$/) {
@@ -54,16 +60,26 @@ while (my $nextline = readline($inputfh)) {
 
   }
   # regex to match question lines
-  #my $matchQuestion = qr{^\s*\d+\.\s*\w+.*}xms;
+  my $matchQuestion = qr{^\s*\d+\.\s*\w+.*}xms;
   # regex to match answer lines
   my $matchAnswer = qr{^\s*\[(?:\s+|X\s*)\]\s*.*$}xms;
+
+  # push questions in a hash
+  if ($nextline =~ $matchQuestion) {
+    $currentQuestion = $nextline;
+    $questions{$currentQuestion} = [ @answers ];
+    @answers = ();
+  }
+
   # shuffle answers
   if ($nextline =~ $matchAnswer){
     push @answers, $nextline;
+
+    #
   }
 
   # write the line in the output file
-  say {$outputfh} $nextline;
+  #say {$outputfh} $nextline;
 }
 close $inputfh or die $!;
 say "Program works!";
@@ -73,7 +89,14 @@ for (@answers){
   say $_;
 }
 
-close $outputfh or die $!;
+say "The question hash contains the following:";
+print Dumper(%questions);
+
+for my $key ( sort keys %questions ) {
+    print "$key = @{$questions{$key}}\n";
+}
+
+#close $outputfh or die $!;
 
 # rendomize the order of the answers for each question
 #@shuffled = shuffle(@answers);

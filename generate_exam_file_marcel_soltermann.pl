@@ -63,19 +63,28 @@ while (my $nextline = readline($inputfh)) {
   my $matchQuestion = qr{^\s*\d+\.\s*\w+.*}xms;
   # regex to match answer lines
   my $matchAnswer = qr{^\s*\[(?:\s+|X\s*)\]\s*.*$}xms;
+  # regex to match the example answers
+  my $matchExampleAnswers = qr{^\s*\[(?:\s+|X\s*)\]\s*This\his.*answer.*$}xms;
 
   # push questions in a hash
   if ($nextline =~ $matchQuestion) {
     $currentQuestion = $nextline;
-    $questions{$currentQuestion} = [ @answers ];
+    #$questions{$currentQuestion} = [ @answers ];
     @answers = ();
   }
 
   # shuffle answers
   if ($nextline =~ $matchAnswer){
-    push @answers, $nextline;
+    if ($nextline !~ $matchExampleAnswers){
+      push @answers, $nextline;
+    }
+  }
 
-    #
+  # push the answer array in the hash if the current line is not a question
+  # or an answer line i.e. the question and all it's answers is already
+  # processed.
+  if ($nextline !~ $matchAnswer && $nextline !~ $matchQuestion) {
+    $questions{$currentQuestion} = [ @answers ];
   }
 
   # write the line in the output file
@@ -93,10 +102,10 @@ say "The question hash contains the following:";
 print Dumper(%questions);
 
 for my $key ( sort keys %questions ) {
-    print "$key = @{$questions{$key}}\n";
+    print "$key\n";
+    for (@{$questions{$key}}) {
+      say $_;
+    }
 }
 
 #close $outputfh or die $!;
-
-# rendomize the order of the answers for each question
-#@shuffled = shuffle(@answers);

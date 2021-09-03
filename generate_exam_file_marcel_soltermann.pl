@@ -28,7 +28,7 @@ my @answers;
 my %questions;
 
 # open a file for the output
-#open (my $outputfh, ">", "./test_data/doublicate.txt");
+open (my $outputfh, ">", "./test_data/doublicate.txt");
 
 my $inputFile = $ARGV[0];
 ##########################################################
@@ -50,21 +50,30 @@ die "File $inputFile has size zero!" if (! -s $inputFile);
 open (my $inputfh, $inputFile) or die $!;
 # read the file line by line
 while (my $nextline = readline($inputfh)) {
-  state $currentQuestion = "Example how it works.";
-  chomp $nextline;
-  # leave the X in the example question
-  if ($nextline !~ m/This is the correct answer$/) {
-
-    # remove the X character from correct answers
-    $nextline =~ s/(\s+\[)X(\]\s.*)/$1 $2/;
-
-  }
   # regex to match question lines
   my $matchQuestion = qr{^\s*\d+\.\s*\w+.*}xms;
   # regex to match answer lines
   my $matchAnswer = qr{^\s*\[(?:\s+|X\s*)\]\s*.*$}xms;
   # regex to match the example answers
   my $matchExampleAnswers = qr{^\s*\[(?:\s+|X\s*)\]\s*This\his.*answer.*$}xms;
+  # state variable to store the current question
+  state $currentQuestion = "no current question";
+  chomp $nextline;
+
+  # Copy the introduction as it is - line by line - to the output file
+  while ($nextline !~ $matchAnswer && $nextline !~ $matchQuestion) {
+    # write the line in the output file
+    say {$outputfh} $nextline;
+    last;
+  }
+
+  # copy the example answers as they are to the output file
+  if ($nextline =~ $matchExampleAnswers) {
+    say {$outputfh} $nextline;
+  }
+
+  # remove the X character from correct answers
+  $nextline =~ s/(\s+\[)X(\]\s.*)/$1 $2/;
 
   # push questions in a hash
   if ($nextline =~ $matchQuestion) {
@@ -74,17 +83,84 @@ while (my $nextline = readline($inputfh)) {
   }
 
   # shuffle answers
-  if ($nextline =~ $matchAnswer){
-    if ($nextline !~ $matchExampleAnswers){
+  if ($nextline =~ $matchAnswer) {
+    if ($nextline !~ $matchExampleAnswers) {
       push @answers, $nextline;
     }
   }
 
   # push the answer array in the hash if the current line is not a question
-  # or an answer line i.e. the question and all it's answers is already
-  # processed.
-  if ($nextline !~ $matchAnswer && $nextline !~ $matchQuestion) {
+  # and not an answer line i.e. the question and all it's answers is
+  # already processed.
+  if (
+  $nextline !~ $matchAnswer &&
+  $nextline !~ $matchQuestion &&
+  $nextline !~ $matchExampleAnswers
+  ) {
     $questions{$currentQuestion} = [ @answers ];
+    delete($questions{'no current question'});
+    say "99999999999";
+    say Dumper(%questions);
+    say "99999999999";
+    #for ($questions{$currentQuestion}->@*) {
+    #  say {$outputfh} $_;
+    #}
+
+
+    if ($currentQuestion ne "no current question") {
+      say {$outputfh} $currentQuestion;
+      # rendomize the order of the answers for each question
+      #my @shuffled = shuffle(@answers);
+      #$questions{$currentQuestion} = [ @answers ];
+      #$questions{$currentQuestion} = [ @shuffled ];
+      #for (@{$questions{$currentQuestion}}) {
+      #  say {$outputfh} $_;
+      #}
+      #for ($questions{$currentQuestion}->@*){
+      #  say {$outputfh} $_;
+      #}
+      say "1111111111111";
+      say Dumper(%questions);
+      say "1111111111111";
+      #delete($questions{$currentQuestion});
+      #say {$outputfh} $questions{$currentQuestion}[0];
+      #$currentQuestion = "no current question";
+      #for (@{$questions{$currentQuestion}}) {
+      #  say {$outputfh} $_;
+      #}
+      for my $key ( sort keys %questions ) {
+          for (@{$questions{$key}}) {
+            if (defined($_)){
+              say {$outputfh} $_;
+            }
+
+
+          }
+          say "key is: $key";
+          print Dumper($questions{$key});
+          say "ok";
+          delete($questions{$key});
+      }
+      #$currentQuestion = "no current question";
+
+    }
+    delete($questions{$currentQuestion});
+
+
+    #say {$outputfh} "####################";
+
+    #for (@{$questions{$currentQuestion}}) {
+    #  say {$outputfh} $_;
+    #}
+    #delete($questions{$currentQuestion});
+
+    #for my $key ( sort keys %questions ) {
+    #    say {$outputfh} "$key\n";
+    #    for (@{$questions{$key}}) {
+    #      say {$outputfh} $_;
+          #delete($questions{$key});
+    #    }
+    #}
   }
 
   # write the line in the output file
@@ -108,4 +184,4 @@ for my $key ( sort keys %questions ) {
     }
 }
 
-#close $outputfh or die $!;
+close $outputfh or die $!;

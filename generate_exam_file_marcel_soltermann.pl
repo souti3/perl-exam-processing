@@ -2,11 +2,15 @@ use v5.32;
 use strict; # optional as a specific version is provided
 use warnings;
 use diagnostics;
+use experimental 'signatures'; # needed to use named arguments
 
 use List::Util 'shuffle'; # needed to randomize the order of the answers
 
 # Simplify the display of data structures...
 use Data::Dumper 'Dumper';
+
+# needed to get the filename
+use File::Basename;
 
 ##########################################################
 # read the argument from command-line, verify that it is
@@ -27,10 +31,17 @@ my @answers;
 # hash for the questions
 my %questions;
 
-# open a file for the output
-open (my $outputfh, ">", "./test_data/doublicate.txt");
+
 
 my $inputFile = $ARGV[0];
+my $inputFileName = getFilename(filepath=>$inputFile);
+my $currentTimestamp = getTimeStamp();
+my $outputFilename = "$currentTimestamp-$inputFileName";
+say "The filename of the output file will be: $outputFilename";
+
+# open a file for the output
+open (my $outputfh, ">", "./test_data/$outputFilename");
+
 ##########################################################
 # file tests with file test operators
 ##########################################################
@@ -185,3 +196,28 @@ for my $key ( sort keys %questions ) {
 }
 
 close $outputfh or die $!;
+
+##########################################################
+#
+# Gets the current timestamp in the format YYYYMMDD-HHMMSS
+# Retruns the timestamp as a String
+#
+##########################################################
+sub getTimeStamp {
+  # get values from localtime and assign them to variables
+  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+  # format the output
+  return sprintf("%04d%02d%02d-%02d%02d%02d", , $year+1900, $mon+1, $mday, $hour, $min, $sec);
+}
+
+##########################################################
+#
+# Gets the filename of the input file, which was passed
+# as argument when calling the script.
+# Retruns the filename as a String
+#
+##########################################################
+sub getFilename ( %args ) {
+  my $filepath = $args{filepath};
+  return basename($filepath);
+}

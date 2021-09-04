@@ -26,11 +26,6 @@ if ($numOfArguments != 1) {
   . qq{argument must be provided in order to execute this program.};
 }
 
-# array for the answers
-my @answers;
-# hash for the questions
-my %questions;
-
 
 
 my $inputFile = $ARGV[0];
@@ -83,117 +78,28 @@ while (my $nextline = readline($inputfh)) {
     say {$outputfh} $nextline;
   }
 
-  # remove the X character from correct answers
-  $nextline =~ s/(\s+\[)X(\]\s.*)/$1 $2/;
+  # new part
+  while ($nextline =~ $matchAnswer) {
+    if ($nextline !~ $matchExampleAnswers) {
+      # remove the X character from correct answers
+      $nextline =~ s/(\s+\[)X(\]\s.*)/$1 $2/;
+      say {$outputfh} $nextline;
+    }
+    last;
+  }
 
-  # push questions in a hash
+
+
+  # print question
   if ($nextline =~ $matchQuestion) {
     $currentQuestion = $nextline;
-    #$questions{$currentQuestion} = [ @answers ];
-    @answers = ();
+    say {$outputfh} $currentQuestion;
   }
 
-  # shuffle answers
-  if ($nextline =~ $matchAnswer) {
-    if ($nextline !~ $matchExampleAnswers) {
-      push @answers, $nextline;
-    }
-  }
-
-  # push the answer array in the hash if the current line is not a question
-  # and not an answer line i.e. the question and all it's answers is
-  # already processed.
-  if (
-  $nextline !~ $matchAnswer &&
-  $nextline !~ $matchQuestion &&
-  $nextline !~ $matchExampleAnswers
-  ) {
-    $questions{$currentQuestion} = [ @answers ];
-    delete($questions{'no current question'});
-    say "99999999999";
-    say Dumper(%questions);
-    say "99999999999";
-    #for ($questions{$currentQuestion}->@*) {
-    #  say {$outputfh} $_;
-    #}
-
-
-    if ($currentQuestion ne "no current question") {
-      say {$outputfh} $currentQuestion;
-      # rendomize the order of the answers for each question
-      #my @shuffled = shuffle(@answers);
-      #$questions{$currentQuestion} = [ @answers ];
-      #$questions{$currentQuestion} = [ @shuffled ];
-      #for (@{$questions{$currentQuestion}}) {
-      #  say {$outputfh} $_;
-      #}
-      #for ($questions{$currentQuestion}->@*){
-      #  say {$outputfh} $_;
-      #}
-      say "1111111111111";
-      say Dumper(%questions);
-      say "1111111111111";
-      #delete($questions{$currentQuestion});
-      #say {$outputfh} $questions{$currentQuestion}[0];
-      #$currentQuestion = "no current question";
-      #for (@{$questions{$currentQuestion}}) {
-      #  say {$outputfh} $_;
-      #}
-      for my $key ( sort keys %questions ) {
-          for (@{$questions{$key}}) {
-            if (defined($_)){
-              say {$outputfh} $_;
-            }
-
-
-          }
-          say "key is: $key";
-          print Dumper($questions{$key});
-          say "ok";
-          delete($questions{$key});
-      }
-      #$currentQuestion = "no current question";
-
-    }
-    delete($questions{$currentQuestion});
-
-
-    #say {$outputfh} "####################";
-
-    #for (@{$questions{$currentQuestion}}) {
-    #  say {$outputfh} $_;
-    #}
-    #delete($questions{$currentQuestion});
-
-    #for my $key ( sort keys %questions ) {
-    #    say {$outputfh} "$key\n";
-    #    for (@{$questions{$key}}) {
-    #      say {$outputfh} $_;
-          #delete($questions{$key});
-    #    }
-    #}
-  }
-
-  # write the line in the output file
-  #say {$outputfh} $nextline;
 }
 close $inputfh or die $!;
 say "Program works!";
 
-say "The answer array contains the following:";
-for (@answers){
-  say $_;
-}
-
-say "The question hash contains the following:";
-print Dumper(%questions);
-
-for my $key ( sort keys %questions ) {
-    print "$key\n";
-    for (@{$questions{$key}}) {
-      say $_;
-    }
-}
 
 close $outputfh or die $!;
 

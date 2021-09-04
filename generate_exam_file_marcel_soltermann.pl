@@ -37,6 +37,9 @@ say "The filename of the output file will be: $outputFilename";
 # open a file for the output
 open (my $outputfh, ">", "./test_data/$outputFilename");
 
+# array to store the answers of a answer block
+my @answers;
+
 ##########################################################
 # file tests with file test operators
 ##########################################################
@@ -64,13 +67,23 @@ while (my $nextline = readline($inputfh)) {
   my $matchExampleAnswers = qr{^\s*\[(?:\s+|X\s*)\]\s*This\his.*answer.*$}xms;
   # state variable to store the current question
   state $currentQuestion = "no current question";
+  # state variable to store the last processed line
+  state $lastline = "";
+
   chomp $nextline;
 
   # Copy the introduction as it is - line by line - to the output file
-  while ($nextline !~ $matchAnswer && $nextline !~ $matchQuestion) {
+  if ($nextline !~ $matchAnswer && $nextline !~ $matchQuestion) {
+    # if lastline was an answer, but nextline is not,
+    # the answer block is finished
+    if ($lastline =~ $matchAnswer && $lastline !~ $matchExampleAnswers) {
+      for (@answers) {
+        say {$outputfh} $_;
+      }
+      @answers = ();
+    }
     # write the line in the output file
     say {$outputfh} $nextline;
-    last;
   }
 
   # copy the example answers as they are to the output file
@@ -79,15 +92,11 @@ while (my $nextline = readline($inputfh)) {
   }
 
   # new part
-  while ($nextline =~ $matchAnswer) {
-    if ($nextline !~ $matchExampleAnswers) {
-      # remove the X character from correct answers
-      $nextline =~ s/(\s+\[)X(\]\s.*)/$1 $2/;
-      say {$outputfh} $nextline;
-    }
-    last;
+  if ($nextline =~ $matchAnswer && $nextline !~ $matchExampleAnswers) {
+    # remove the X character from correct answers
+    $nextline =~ s/(\s+\[)X(\]\s.*)/$1 $2/;
+    push @answers, $nextline;
   }
-
 
 
   # print question
@@ -95,6 +104,8 @@ while (my $nextline = readline($inputfh)) {
     $currentQuestion = $nextline;
     say {$outputfh} $currentQuestion;
   }
+
+  $lastline = $nextline;
 
 }
 close $inputfh or die $!;

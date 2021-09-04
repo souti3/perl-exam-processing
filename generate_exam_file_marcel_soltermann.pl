@@ -77,8 +77,10 @@ while (my $nextline = readline($inputfh)) {
     # if lastline was an answer, but nextline is not,
     # the answer block is finished
     if ($lastline =~ $matchAnswer && $lastline !~ $matchExampleAnswers) {
-      for (@answers) {
-        say {$outputfh} $_;
+      # rendomize the order of the answers for each question
+      my @shuffledAnswers = shuffle(@answers);
+      for my $answer (@shuffledAnswers) {
+        say {$outputfh} $answer;
       }
       @answers = ();
     }

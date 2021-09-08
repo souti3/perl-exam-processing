@@ -54,7 +54,7 @@ while (my $nextline = readline($inputfh)) {
   # regex to match question lines
   my $matchQuestion = qr{^\s*\d+\.\s*\w+.*}xms;
   # regex to match answer lines
-  my $matchAnswer = qr{^\s*\[(?:\s+|X\s*)\]\s*.*$}xms;
+  my $matchAnswer = qr{^\s*\[(?:\s*|X\s*)\]\s*.*$}xms;
   # regex to match the example answers
   my $matchExampleAnswers = qr{^\s*\[(?:\s+|X\s*)\]\s*This\his.*answer.*$}xms;
   # state variable to store the current question

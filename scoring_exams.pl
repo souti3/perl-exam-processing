@@ -21,12 +21,35 @@ if ($numOfArguments <= 1) {
   . qq{arguments must be provided in order to execute this program.};
 }
 
-my $solutionFile =  $ARGV[0];
+# store the path to the solution file in a variable
+my $solutionFile =  shift(@ARGV);
+
+# store the path to the exam files from students in an array
+my @studentFiles = @ARGV;
+
 
 # file tests with file test operators
 # Using the module Filechecks.pm
-for my $inputFile (@ARGV) {
+inputcheck($solutionFile);
+for my $inputFile (@studentFiles) {
   inputcheck($inputFile);
 }
+
+# open the solution file
+open (my $solutionfh, $solutionFile) or die $!;
+
+# regex to match question lines
+my $matchQuestion = qr{^\s*\d+\.\s*\w+.*}xms;
+
+# read the solution file line by line
+while (my $nextline = readline($solutionfh)) {
+  chomp $nextline;
+  # if $nextline is a question
+  if ($nextline =~ $matchQuestion) {
+    # save the question
+    say "question: $nextline";
+  }
+}
+
 
 say "Program works!";

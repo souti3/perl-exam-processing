@@ -38,7 +38,7 @@ my $outputFilename = "$currentTimestamp-$inputFileName";
 say "The filename of the output file will be: $outputFilename";
 
 # open a file for the output
-open (my $outputfh, ">", "./test_data/$outputFilename");
+open (my $outputfh, ">", "./test_data/$outputFilename") or die $!;
 
 # array to store the answers of a answer block
 my @answers;

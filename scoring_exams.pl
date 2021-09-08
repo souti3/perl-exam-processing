@@ -3,6 +3,9 @@ use strict; # optional as a specific version is provided
 use warnings;
 use diagnostics;
 
+# load the self written perl module
+use Utility::Filechecks;
+
 ##########################################################
 # read the argument from command-line, verify that it is
 # a file and open it
@@ -19,5 +22,11 @@ if ($numOfArguments <= 1) {
 }
 
 my $solutionFile =  $ARGV[0];
+
+# file tests with file test operators
+# Using the module Filechecks.pm
+for my $inputFile (@ARGV) {
+  inputcheck($inputFile);
+}
 
 say "Program works!";

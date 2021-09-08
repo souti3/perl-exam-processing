@@ -1,7 +1,11 @@
 package Utility::Filechecks 0.000001;
 use v5.32;
 use warnings;
-use experimentals;
+use experimental 'signatures';
+use base 'Exporter';
+
+our @EXPORT = ( 'inputcheck' );
+
 
 sub inputcheck ($inputFile) {
   ##########################################################

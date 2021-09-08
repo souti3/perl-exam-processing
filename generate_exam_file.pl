@@ -12,6 +12,9 @@ use Data::Dumper 'Dumper';
 # needed to get the filename
 use File::Basename;
 
+# load the self written perl module
+use Utility::Filechecks;
+
 ##########################################################
 # read the argument from command-line, verify that it is
 # a file and open it
@@ -40,21 +43,10 @@ open (my $outputfh, ">", "./test_data/$outputFilename");
 # array to store the answers of a answer block
 my @answers;
 
-##########################################################
+
 # file tests with file test operators
-##########################################################
-# make sure that the file exists
-die "File $inputFile does not exists!" if (! -e $inputFile);
-# make sure that the file is readable
-die "File $inputFile is not readable!" if (! -r $inputFile);
-# make sure that the file is an ASCII text file
-die "File $inputFile is not an ASCII text file!" if (! -T $inputFile);
-# make sure that the file is a plain file
-die "File $inputFile is not a plain file!" if (! -f $inputFile);
-# make sure that the file is not empty
-die "File $inputFile is empty!" if (-z $inputFile);
-# make sure that the file has nonzero size
-die "File $inputFile has size zero!" if (! -s $inputFile);
+# Using the module Filechecks.pm
+inputcheck($inputFile);
 # open the provided examination master file
 open (my $inputfh, $inputFile) or die $!;
 # read the file line by line

@@ -55,6 +55,25 @@ for my $examFile (@studentFiles) {
   say "Students Q and A";
   say Dumper %studentsQandA;
   say "_________________";
+
+  # compare the number of keys (i.e. number of questions) in the solution file
+  # with the number of keys (i.e. number of question) in the exam file
+  my $questionComparison = keys %solutionQandA <=> keys %studentsQandA;
+  say "Student File name: $examFile";
+  say "Question Comparison: $questionComparison";
+  if ($questionComparison == 0) {
+    say "same number of questions";
+  }
+  elsif ($questionComparison == 1) {
+    say "$examFile:";
+    say "\t Missing question:";
+  }
+  else {
+    say "$examFile:";
+    say "\t Too many questions:";
+  }
+
+
   # close the exam file
   close $examfh or die $!;
 }

@@ -66,11 +66,24 @@ for my $examFile (@studentFiles) {
   }
   elsif ($questionComparison == 1) {
     say "$examFile:";
-    say "\t Missing question:";
+    say "\t There are questions missing in this file!";
   }
   else {
     say "$examFile:";
-    say "\t Too many questions:";
+    say "\t There are too many questions in this file!";
+  }
+
+  # iterate through the questions of the solution file
+  while (my $nextQuestion = each %solutionQandA) {
+    # check whether the question exists in the exam file
+    if (exists $studentsQandA{$nextQuestion}){
+      # compare the answers
+      say "question exists...let's compare the answers..."
+    }
+    else {
+      say "$examFile:";
+      say "\t Missing question: $nextQuestion";
+    }
   }
 
 

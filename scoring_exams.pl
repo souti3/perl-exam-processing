@@ -52,17 +52,16 @@ for my $examFile (@studentFiles) {
   open (my $examfh, $examFile) or die $!;
   # store the questions and answers in a hash
   my %studentsQandA = writeQandAinHash(fileHandle=>$examfh);
-  say "Students Q and A";
-  say Dumper %studentsQandA;
-  say "_________________";
+  #say "Students Q and A";
+  #say Dumper %studentsQandA;
+  #say "_________________";
 
   # compare the number of keys (i.e. number of questions) in the solution file
   # with the number of keys (i.e. number of question) in the exam file
   my $questionComparison = keys %solutionQandA <=> keys %studentsQandA;
-  say "Student File name: $examFile";
   say "Question Comparison: $questionComparison";
   if ($questionComparison == 0) {
-    say "same number of questions";
+    say "$solutionFile and $examFile have the same number of questions";
   }
   elsif ($questionComparison == 1) {
     say "$examFile:";
@@ -79,6 +78,14 @@ for my $examFile (@studentFiles) {
     if (exists $studentsQandA{$nextQuestion}){
       # compare the answers
       say "question exists...let's compare the answers..."
+      # number of answers should be equal
+      # i.e. the number of elements in the array reference
+      # find out which answer is the correct one in the solution file
+      # maybe loop through the array and find the line where the regex matches
+      # or with a grep
+      # Check that there is exactly one answer marked as correct in the
+      # exam file i.e. otherwise score is zero
+      # Check whether the correct answer is marked as correct in the exam file
     }
     else {
       say "$examFile:";
@@ -96,7 +103,7 @@ close $solutionfh or die $!;
 
 
 
-say Dumper %solutionQandA;
+#say Dumper %solutionQandA;
 
 say "Program works!";
 
@@ -145,7 +152,7 @@ sub writeQandAinHash ( %args ) {
     # if $nextline is a question
     if ($nextline =~ $matchQuestion) {
       # save the question
-      say "question: $nextline";
+      #say "question: $nextline";
       $currentQuestion = $nextline;
     }
 

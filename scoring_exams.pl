@@ -77,8 +77,24 @@ for my $examFile (@studentFiles) {
     # check whether the question exists in the exam file
     if (exists $studentsQandA{$nextQuestion}){
       # compare the answers
-      say "question exists...let's compare the answers..."
+      #say "question exists...let's compare the answers...";
       # number of answers should be equal
+      my $studAnswers = @{$studentsQandA{$nextQuestion}};
+      my $solAnswers = @{$solutionQandA{$nextQuestion}};
+      #say "Number of Answers in Solution File: $solAnswers";
+      #say "Number of Answers in Students File: $studAnswers";
+      # Loop through the answers in the solution file
+      for my $solutionAnswer (@{$solutionQandA{$nextQuestion}}) {
+        # check whether the answer exists in students exam file
+        if ( grep $solutionAnswer, @{$studentsQandA{$nextQuestion}} ) {
+          # answer exists, everything ok
+        }
+        else {
+          # answer is missing in students exam file
+          say "$examFile:";
+          say "\t Missing answer: $solutionAnswer";
+        }
+      }
       # i.e. the number of elements in the array reference
       # find out which answer is the correct one in the solution file
       # maybe loop through the array and find the line where the regex matches

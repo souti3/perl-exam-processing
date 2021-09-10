@@ -76,26 +76,25 @@ for my $examFile (@studentFiles) {
   while (my $nextQuestion = each %solutionQandA) {
     # check whether the question exists in the exam file
     if (exists $studentsQandA{$nextQuestion}){
+      ##########################################################
       # compare the answers
-      #say "question exists...let's compare the answers...";
-      # number of answers should be equal
-      my $studAnswers = @{$studentsQandA{$nextQuestion}};
-      my $solAnswers = @{$solutionQandA{$nextQuestion}};
-      #say "Number of Answers in Solution File: $solAnswers";
-      #say "Number of Answers in Students File: $studAnswers";
+      ##########################################################
       # Loop through the answers in the solution file
       for my $solutionAnswer (@{$solutionQandA{$nextQuestion}}) {
+        # use split function to remove the checkbox in front of the answer
+        my @splittedString = split(/\s*\[(?:\s*|X\s*)\]\s*/, $solutionAnswer);
+        # the actual answer text is stored as the second element
+        my $answerText = $splittedString[1];
         # check whether the answer exists in students exam file
-        if ( grep $solutionAnswer, @{$studentsQandA{$nextQuestion}} ) {
+        if ( grep(/$answerText/, @{$studentsQandA{$nextQuestion}}) ) {
           # answer exists, everything ok
         }
         else {
           # answer is missing in students exam file
           say "$examFile:";
-          say "\t Missing answer: $solutionAnswer";
+          say "\t Missing answer: $answerText";
         }
       }
-      # i.e. the number of elements in the array reference
       # find out which answer is the correct one in the solution file
       # maybe loop through the array and find the line where the regex matches
       # or with a grep

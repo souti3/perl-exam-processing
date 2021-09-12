@@ -81,10 +81,17 @@ for my $examFile (@studentFiles) {
       ##########################################################
       # Loop through the answers in the solution file
       for my $solutionAnswer (@{$solutionQandA{$nextQuestion}}) {
-        # use split function to remove the checkbox in front of the answer
-        my @splittedString = split(/\s*\[(?:\s*|X\s*)\]\s*/, $solutionAnswer);
-        # the actual answer text is stored as the second element
-        my $answerText = $splittedString[1];
+        # find the correct answer
+        my $correctAnswer = "";
+        if ($solutionAnswer =~ m/^\s*\[\s*X\s*\]\s*/xms) {
+          $correctAnswer = $solutionAnswer;
+        }
+        $correctAnswer = removeCheckbox(string=>$correctAnswer);
+        #say "correct Answer is: $correctAnswer";
+
+        # call subroutine to remove the checkbox in front of the answer
+        my $answerText = removeCheckbox(string=>$solutionAnswer);
+
         # check whether the answer exists in students exam file
         if ( grep(/$answerText/, @{$studentsQandA{$nextQuestion}}) ) {
           # answer exists, everything ok
@@ -176,4 +183,14 @@ sub writeQandAinHash ( %args ) {
 
   # return the hash with all questions and answers of the file
   return %questionAnswer;
+}
+
+sub removeCheckbox ( %args ) {
+  # String with a checkbox which was provided as argument
+  my $string = $args{'string'};
+  # use split function to remove the checkbox in front of the answer
+  my @splittedString = split(/\s*\[(?:\s*|X\s*)\]\s*/, $string);
+  # the actual answer text is stored as the second element
+  my $answerText = $splittedString[1];
+  return $answerText;
 }

@@ -72,6 +72,9 @@ for my $examFile (@studentFiles) {
     say "\t There are too many questions in this file!";
   }
 
+  # variable to store the score
+  my $score = 0;
+
   # iterate through the questions of the solution file
   while (my $nextQuestion = each %solutionQandA) {
     # check whether the question exists in the exam file
@@ -83,6 +86,8 @@ for my $examFile (@studentFiles) {
       my $correctAnswer = "";
       # regex which matches an answer which is marked as correct
       my $matchMarkedAnswers = qr{^\s*\[\s*X\s*\]\s*}xms;
+      # count the number of answers which are marked as correct
+      my $numMarkedAsCorrect = 0;
       # Loop through the answers in the solution file
       for my $solutionAnswer (@{$solutionQandA{$nextQuestion}}) {
         # find the correct answer in the solution file
@@ -108,12 +113,23 @@ for my $examFile (@studentFiles) {
           say "\t Missing answer: $answerText";
         }
       }
-      # find out which answer is the correct one in the solution file
-      # maybe loop through the array and find the line where the regex matches
-      # or with a grep
-      # Check that there is exactly one answer marked as correct in the
-      # exam file i.e. otherwise score is zero
-      # Check whether the correct answer is marked as correct in the exam file
+
+      # Loop through the answers in the exam file
+      for my $studentAnswer (@{$studentsQandA{$nextQuestion}}) {
+        # check whether the answer is marked as correct
+        if ($studentAnswer =~ $matchMarkedAnswers) {
+          # increase the counter for answers which are marked as correct
+          $numMarkedAsCorrect++;
+        }
+      }
+      say "Number of answers which are marked as correct: $numMarkedAsCorrect";
+      # set the counter back to zero for the next question
+      $numMarkedAsCorrect = 0;
+      # ToDo:
+      # if $numMarkedAsCorrect != 1 => score stays
+      # if $numMarkedAsCorrect == 1 => Compare the answer with the solution
+      # if the answer was correct => score++
+      
     }
     else {
       say "$examFile:";

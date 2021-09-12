@@ -79,15 +79,21 @@ for my $examFile (@studentFiles) {
       ##########################################################
       # compare the answers
       ##########################################################
+      # string which will hold the correct answer
+      my $correctAnswer = "";
+      # regex which matches an answer which is marked as correct
+      my $matchMarkedAnswers = qr{^\s*\[\s*X\s*\]\s*}xms;
       # Loop through the answers in the solution file
       for my $solutionAnswer (@{$solutionQandA{$nextQuestion}}) {
-        # find the correct answer
-        my $correctAnswer = "";
-        if ($solutionAnswer =~ m/^\s*\[\s*X\s*\]\s*/xms) {
+        # find the correct answer in the solution file
+        if ($solutionAnswer =~ $matchMarkedAnswers) {
+          # assign the correct answer to the string variable
           $correctAnswer = $solutionAnswer;
+          # remove the checkbox in front of the correct answer
+          $correctAnswer = removeCheckbox(string=>$correctAnswer);
         }
-        $correctAnswer = removeCheckbox(string=>$correctAnswer);
-        #say "correct Answer is: $correctAnswer";
+
+        say "correct Answer is: $correctAnswer";
 
         # call subroutine to remove the checkbox in front of the answer
         my $answerText = removeCheckbox(string=>$solutionAnswer);

@@ -59,21 +59,23 @@ for my $examFile (@studentFiles) {
   # compare the number of keys (i.e. number of questions) in the solution file
   # with the number of keys (i.e. number of question) in the exam file
   my $questionComparison = keys %solutionQandA <=> keys %studentsQandA;
-  say "Question Comparison: $questionComparison";
+  #say "Question Comparison: $questionComparison";
   if ($questionComparison == 0) {
-    say "$solutionFile and $examFile have the same number of questions";
+    #say "$solutionFile and $examFile have the same number of questions";
   }
   elsif ($questionComparison == 1) {
-    say "$examFile:";
-    say "\t There are questions missing in this file!";
+    #say "$examFile:";
+    #say "\t There are questions missing in this file!";
   }
   else {
-    say "$examFile:";
-    say "\t There are too many questions in this file!";
+    #say "$examFile:";
+    #say "\t There are too many questions in this file!";
   }
 
   # variable to store the score
   my $score = 0;
+  # count the total number of questions
+  my $numberOfQuestions = 0;
 
   # iterate through the questions of the solution file
   while (my $nextQuestion = each %solutionQandA) {
@@ -98,8 +100,6 @@ for my $examFile (@studentFiles) {
           $correctAnswer = removeCheckbox(string=>$correctAnswer);
         }
 
-        say "correct Answer is: $correctAnswer";
-
         # call subroutine to remove the checkbox in front of the answer
         my $answerText = removeCheckbox(string=>$solutionAnswer);
 
@@ -114,28 +114,39 @@ for my $examFile (@studentFiles) {
         }
       }
 
+      # store the answer which the student marked as $correct
+      my $answerMarkedAsCorrect = "";
+
       # Loop through the answers in the exam file
       for my $studentAnswer (@{$studentsQandA{$nextQuestion}}) {
         # check whether the answer is marked as correct
         if ($studentAnswer =~ $matchMarkedAnswers) {
           # increase the counter for answers which are marked as correct
           $numMarkedAsCorrect++;
+          $answerMarkedAsCorrect = removeCheckbox(string=>$studentAnswer);
         }
       }
-      say "Number of answers which are marked as correct: $numMarkedAsCorrect";
+      # if there is only one answer marked as correct
+      if ($numMarkedAsCorrect == 1) {
+        # compare the answer from the student with the solution answer
+        if ($answerMarkedAsCorrect eq $correctAnswer) {
+          # increase the score by one
+          $score++;
+        }
+      }
       # set the counter back to zero for the next question
       $numMarkedAsCorrect = 0;
-      # ToDo:
-      # if $numMarkedAsCorrect != 1 => score stays
-      # if $numMarkedAsCorrect == 1 => Compare the answer with the solution
-      # if the answer was correct => score++
-      
+
     }
     else {
       say "$examFile:";
       say "\t Missing question: $nextQuestion";
     }
+    # increase the number of questions by one
+    $numberOfQuestions++;
   }
+
+  say "$examFile..............$score/$numberOfQuestions";
 
 
   # close the exam file

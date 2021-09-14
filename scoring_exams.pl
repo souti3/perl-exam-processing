@@ -44,6 +44,9 @@ open (my $solutionfh, $solutionFile) or die $!;
 # hash to store question and answers of the solution file
 my %solutionQandA = writeQandAinHash(fileHandle=>$solutionfh);
 
+# array to store the score of the exam
+my @scores;
+
 # iterate through the provided exam files from students
 for my $examFile (@studentFiles) {
   # check wether the files are valid with file test operators
@@ -150,8 +153,8 @@ for my $examFile (@studentFiles) {
   my $scoringOutput = sprintf "%-60s %-30s %1d/%1d", $examFile, " ", $score, $numberOfQuestions;
   # use a regex to replace whitespace characters with dots
   $scoringOutput =~ s/\s/\./g;
-  # print the result
-  say $scoringOutput;
+  # add the score to the array in order to print it out at the end
+  push @scores, $scoringOutput;
 
   # close the exam file
   close $examfh or die $!;
@@ -164,7 +167,12 @@ close $solutionfh or die $!;
 
 #say Dumper %solutionQandA;
 
-say "Program works!";
+say "The evaluation of the exams showed the following scores:";
+
+# print the scores
+for my $examScore (@scores) {
+  say $examScore;
+}
 
 sub writeQandAinHash ( %args ) {
   # hash to store the questions together with the answer array

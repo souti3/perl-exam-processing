@@ -146,8 +146,12 @@ for my $examFile (@studentFiles) {
     $numberOfQuestions++;
   }
 
-  say "$examFile..............$score/$numberOfQuestions";
-
+  # format the output with sprintf
+  my $scoringOutput = sprintf "%-60s %-30s %1d/%1d", $examFile, " ", $score, $numberOfQuestions;
+  # use a regex to replace whitespace characters with dots
+  $scoringOutput =~ s/\s/\./g;
+  # print the result
+  say $scoringOutput;
 
   # close the exam file
   close $examfh or die $!;

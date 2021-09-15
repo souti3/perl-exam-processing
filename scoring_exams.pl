@@ -2,18 +2,18 @@ use v5.32;
 use strict; # optional as a specific version is provided
 use warnings;
 use diagnostics;
-
 use experimental 'signatures'; # needed to use named arguments
 
-# Simplify the display of data structures...
+# Simplifies the displaying of data structures
 use Data::Dumper 'Dumper';
 
 # load the self written perl module
 use Utility::Filechecks;
 
 ##########################################################
-# read the argument from command-line, verify that it is
-# a file and open it
+# read the arguments from command-line, verify that the
+# correct number of arguments are provided and store them
+# in variables.
 ##########################################################
 # fetch the number of arguments provided
 my $numOfArguments = @ARGV;
@@ -49,15 +49,14 @@ my @scores;
 
 # iterate through the provided exam files from students
 for my $examFile (@studentFiles) {
-  # check wether the files are valid with file test operators
+  # check whether the files are valid with file test operators
   inputcheck($examFile);
   # open the exam file
   open (my $examfh, $examFile) or die $!;
   # store the questions and answers in a hash
   my %studentsQandA = writeQandAinHash(fileHandle=>$examfh);
-  #say "Students Q and A";
   #say Dumper %studentsQandA;
-  #say "_________________";
+
 
   # compare the number of keys (i.e. number of questions) in the solution file
   # with the number of keys (i.e. number of question) in the exam file
@@ -117,15 +116,19 @@ for my $examFile (@studentFiles) {
         }
       }
 
-      # store the answer which the student marked as $correct
+      # store the answer which the student marked as correct
       my $answerMarkedAsCorrect = "";
 
       # Loop through the answers in the exam file
       for my $studentAnswer (@{$studentsQandA{$nextQuestion}}) {
-        # check whether the answer is marked as correct
+        ##########################################################
+        # grade the answers
+        ##########################################################
+        # check whether the current answer is marked as correct
         if ($studentAnswer =~ $matchMarkedAnswers) {
           # increase the counter for answers which are marked as correct
           $numMarkedAsCorrect++;
+          # remove the checkbox in front of the answer
           $answerMarkedAsCorrect = removeCheckbox(string=>$studentAnswer);
         }
       }
@@ -142,6 +145,7 @@ for my $examFile (@studentFiles) {
 
     }
     else {
+      # The question is missing in students exam file
       say "$examFile:";
       say "\t Missing question: $nextQuestion";
     }
@@ -154,6 +158,7 @@ for my $examFile (@studentFiles) {
   # use a regex to replace whitespace characters with dots
   $scoringOutput =~ s/\s/\./g;
   # add the score to the array in order to print it out at the end
+  # of this program
   push @scores, $scoringOutput;
 
   # close the exam file
@@ -163,17 +168,25 @@ for my $examFile (@studentFiles) {
 # close the solution file
 close $solutionfh or die $!;
 
-
-
 #say Dumper %solutionQandA;
 
 say "The evaluation of the exams showed the following scores:";
 
-# print the scores
+# print the scores for each exam file
 for my $examScore (@scores) {
   say $examScore;
 }
 
+##########################################################
+#
+# Gets a file handle as argument. This file handle
+# belongs to an exam file with questions and answers.
+# This subroutine stores the questions (as key) and
+# the answers (in an array reference as value) in a hash.
+# Returns a hash with the questions (as key) and the
+# answers (as value) of the corresponding file.
+#
+##########################################################
 sub writeQandAinHash ( %args ) {
   # hash to store the questions together with the answer array
   my %questionAnswer;
@@ -182,7 +195,7 @@ sub writeQandAinHash ( %args ) {
   # file handle provided as argument
   my $fileHandle = $args{'fileHandle'};
 
-  # read the solution file line by line
+  # read the file line by line
   while (my $nextline = readline($fileHandle)) {
     # regex to match question lines
     my $matchQuestion = qr{^\s*\d+\.\s*\w+.*}xms;
@@ -219,10 +232,10 @@ sub writeQandAinHash ( %args ) {
     # if $nextline is a question
     if ($nextline =~ $matchQuestion) {
       # save the question
-      #say "question: $nextline";
       $currentQuestion = $nextline;
     }
 
+    # assign the processed line to the variable $lastline
     $lastline = $nextline;
   }
 
@@ -230,6 +243,15 @@ sub writeQandAinHash ( %args ) {
   return %questionAnswer;
 }
 
+##########################################################
+#
+# Gets a string as argument, which contains an answer.
+# This answer string was read from an exam file and
+# contains a checkbox in front of the answer text.
+# This subroutine removes the checkbox from the string.
+# Returns the pure text of the answer as a String.
+#
+##########################################################
 sub removeCheckbox ( %args ) {
   # String with a checkbox which was provided as argument
   my $string = $args{'string'};
@@ -237,5 +259,6 @@ sub removeCheckbox ( %args ) {
   my @splittedString = split(/\s*\[(?:\s*|X\s*)\]\s*/, $string);
   # the actual answer text is stored as the second element
   my $answerText = $splittedString[1];
+  # return the string with the pure text of the answer
   return $answerText;
 }

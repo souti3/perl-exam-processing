@@ -1,2 +1,3 @@
 # ignore the test data
-test_data/
+test_data/test.txt
+test_data/special_exam.txt

@@ -29,9 +29,43 @@ if ($numOfArguments <= 1) {
 # store the path to the solution file in a variable
 my $solutionFile =  shift(@ARGV);
 
-# store the path to the exam files from students in an array
-my @studentFiles = @ARGV;
+# array to store the path to the exam files of the students
+my @studentFiles;
 
+# check whether the user provided exactly two arguments
+if ($numOfArguments == 2) {
+  # check whether the second argument (which is now the first and
+  # only array element since we removed the solution file from the
+  # array) is a directory
+  if (-d $ARGV[0]) {
+    ##########################################################
+    # read all files from this directory and add them to an array
+    ##########################################################
+    # open the directory
+    opendir (my $examdir, $ARGV[0]) or die $!;
+    # loop through the files in the directory
+    while (my $nextfile = readdir($examdir)) {
+      # exclude special folders . and ..
+      next if $nextfile =~ /^\.\.?$/;
+      # generate the filepath with directory and file name
+      my $filepath = "$ARGV[0]/$nextfile";
+      # push the filepath in the array
+      push @studentFiles, $filepath;
+    }
+    # close the directory
+    closedir($examdir);
+  }
+  else {
+    # the argument is not a directory
+    # store the path to the exam files from students in an array
+    @studentFiles = @ARGV;
+  }
+}
+else {
+  # more than two arguments provided by the user
+  # store the path to the exam files from students in an array
+  @studentFiles = @ARGV;
+}
 
 # file tests with file test operators
 # Using the module Filechecks.pm

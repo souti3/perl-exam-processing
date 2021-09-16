@@ -26,7 +26,7 @@ my $numOfArguments = @ARGV;
 if ($numOfArguments != 1) {
   die
     qq{You provided $numOfArguments arguments. However, }
-  . qq{exactly one (the name of the examination master file)}
+  . qq{exactly one (the name of the examination master file) }
   . qq{argument must be provided in order to execute this program.};
 }
 
@@ -115,6 +115,8 @@ while (my $nextline = readline($inputfh)) {
 close $inputfh or die $!;
 # close the output file
 close $outputfh or die $!;
+
+say "Program executed successful!"
 
 ##########################################################
 #

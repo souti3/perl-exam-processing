@@ -116,7 +116,7 @@ close $inputfh or die $!;
 # close the output file
 close $outputfh or die $!;
 
-say "Program executed successful!"
+say "Program executed successful!";
 
 ##########################################################
 #

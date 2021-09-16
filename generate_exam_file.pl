@@ -4,7 +4,8 @@ use warnings;
 use diagnostics;
 use experimental 'signatures'; # needed to use named arguments
 
-use List::Util 'shuffle'; # needed to randomize the order of the answers
+# needed to randomize the order of the answers
+use List::Util 'shuffle';
 
 # Simplify the display of data structures...
 use Data::Dumper 'Dumper';
@@ -30,23 +31,25 @@ if ($numOfArguments != 1) {
 }
 
 
-
+# store the argument in a variable
 my $inputFile = $ARGV[0];
+# file tests with file test operators
+# Using the module Filechecks.pm
+inputcheck($inputFile);
+# call subroutine to get the file name
 my $inputFileName = getFilename(filepath=>$inputFile);
+# call subroutine to get the current timestamp
 my $currentTimestamp = getTimeStamp();
+# build the file name for the new file
 my $outputFilename = "$currentTimestamp-$inputFileName";
-say "The filename of the output file will be: $outputFilename";
+#say "The filename of the output file will be: $outputFilename";
 
 # open a file for the output
-open (my $outputfh, ">", "./test_data/$outputFilename") or die $!;
+open (my $outputfh, ">", "./$outputFilename") or die $!;
 
 # array to store the answers of a answer block
 my @answers;
 
-
-# file tests with file test operators
-# Using the module Filechecks.pm
-inputcheck($inputFile);
 # open the provided examination master file
 open (my $inputfh, $inputFile) or die $!;
 # read the file line by line
@@ -69,11 +72,13 @@ while (my $nextline = readline($inputfh)) {
     # if lastline was an answer, but nextline is not,
     # the answer block is finished
     if ($lastline =~ $matchAnswer && $lastline !~ $matchExampleAnswers) {
-      # rendomize the order of the answers for each question
+      # randomize the order of the answers for each question
       my @shuffledAnswers = shuffle(@answers);
       for my $answer (@shuffledAnswers) {
+        # write the answers in the output file
         say {$outputfh} $answer;
       }
+      # clear the array as the next question will follow
       @answers = ();
     }
     # write the line in the output file
@@ -85,50 +90,56 @@ while (my $nextline = readline($inputfh)) {
     say {$outputfh} $nextline;
   }
 
-  # new part
+  # if nextline is an answer, but not an example answer
   if ($nextline =~ $matchAnswer && $nextline !~ $matchExampleAnswers) {
     # remove the X character from correct answers
     $nextline =~ s/(\s+\[)X(\]\s.*)/$1 $2/;
+    # push the answer in an array
     push @answers, $nextline;
   }
 
 
-  # print question
+  # if nextline is a question
   if ($nextline =~ $matchQuestion) {
+    # store the question in a variable
     $currentQuestion = $nextline;
+    # write the question in the output file
     say {$outputfh} $currentQuestion;
   }
 
+  # assign the processed line to the variable $lastline
   $lastline = $nextline;
 
 }
+# close the input file
 close $inputfh or die $!;
-say "Program works!";
-
-
+# close the output file
 close $outputfh or die $!;
 
 ##########################################################
 #
-# Gets the current timestamp in the format YYYYMMDD-HHMMSS
-# Retruns the timestamp as a String
+# No argument is needed to call this subroutine.
+# Fetches the current timestamp in the format YYYYMMDD-HHMMSS
+# Returns the timestamp as a String.
 #
 ##########################################################
 sub getTimeStamp {
   # get values from localtime and assign them to variables
   my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
-  # format the output
+  # format the output and return it
   return sprintf("%04d%02d%02d-%02d%02d%02d", , $year+1900, $mon+1, $mday, $hour, $min, $sec);
 }
 
 ##########################################################
 #
-# Gets the filename of the input file, which was passed
-# as argument when calling the script.
-# Retruns the filename as a String
+# Gets a path of a file as argument.
+# Extracts the file name out of the whole path.
+# Returns the file name as a String.
 #
 ##########################################################
 sub getFilename ( %args ) {
+  # file path provided as argument
   my $filepath = $args{filepath};
+  # return the file name by using the module File::Basename
   return basename($filepath);
 }

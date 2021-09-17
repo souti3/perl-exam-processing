@@ -5,7 +5,7 @@ The Perl programs are written and tested with the Perl version 5.32. I used the 
 ### Program generate_exam_file.pl
 Besides the already above-mentioned specifiers and modules, generate_exam_file.pl uses the “File::Basename” module from CPAN. With this module I was able to extract the file name from the file path. In addition, I used the module “List::Util” from CPAN in order to shuffle the answers (randomize the order of the answers).
 ### Program scoring_exams.pl
-In the Perl program scoring_exams.pl I did not used any additional Perl modules from CPAN. All specifiers and modules of this program are already listed in the section “valid for both Perl programs”.
+In addition to the already mentioned specifiers and modules in the section “valid for both Perl programs”, I used the following modules in the Perl program scoring_exams.pl: “List::Util qw(reduce)” to find the minimal value in a hash, “Text::Levenshtein qw(distance)” to calculate the edit-distance and “Lingua::EN::StopWords qw(%StopWords)” to remove stop words. All of these modules were necessary to complete the extension (part 2).
 ### Module Filechecks.pm
 Like the two Perl programs, the module Filechecks.pm also uses Perl version 5.32. It uses the specifiers “warnings” and “experimental 'signatures'” as well as the module “base 'Exporter'”. The module exports a subroutine called “inputcheck”.
 ## Randomization of questions - Main task (part 1a)
@@ -53,3 +53,16 @@ For example:
 For example:
 
 `perl scoring_exams.pl test_data\short_exam_master_file.txt test_data\Student_answers`
+
+## Inexact matching of questions and answers – Extension (part 2)
+The extension (part 2) is solved directly in the Perl program called scoring_exams.pl.
+
+In order to enable inexact matching, I enhanced the existing Perl program. However, the execution of the program stays the same. Most of the new code was added in the subroutines. The questions and answers are now normalized and questions with an edit-distance lower than 10% are accepted as matched. Unfortunately, I could not implement the inexact matching for the answers. I faced some issues and was not able to solve them just in time. That is also the reason, why the score for the file “student_Giulia_Gruber.txt” is not correct.
+
+The code itself was documented directly in the Perl program with the help of comments.
+
+## Extension part 3 and part 4
+Unfortunately, I had not enough time to look at extension part 3 and part 4. The implementation and documentation of the other parts of this project already exceeded the 40 hours which were reserved for this project.
+
+## Example data and test files
+The files, which I used to test the programs can be found in the folder “test_data”. This folder contains two solution files. The directory “Student_answers” contains some examples of exams written by students. They fit for the solution file called “short_exam_master_file.txt”.

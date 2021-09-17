@@ -13,6 +13,9 @@ use Utility::Filechecks;
 # used to remove stop words from texts
 use Lingua::EN::StopWords qw(%StopWords);
 
+# used to calculate the Levenshtein edit distance between two strings
+use Text::Levenshtein qw(distance);
+
 ##########################################################
 # read the arguments from command-line, verify that the
 # correct number of arguments are provided and store them
@@ -231,6 +234,12 @@ for my $examScore (@scores) {
 }
 say "\n________________________________________________________________________\n";
 
+# test edit distance
+my $string1 = "Hello from Marcel and Welcome to Perl";
+my $string2 = "Hallo von Marcel and Welcome to Perl";
+my $dist = getEditDistanceInPercent(solutionString=>$string1, studentString=>$string2);
+say "Distance is: $dist";
+
 ##########################################################
 #
 # Gets a file handle as argument. This file handle
@@ -348,4 +357,19 @@ sub getNormalizedString ( %args ) {
   $noStopWords =~ s/\s+/ /g;
   # return the normalized string
   return $noStopWords;
+}
+
+sub getEditDistanceInPercent ( %args ) {
+  # string from solution file, which was provided as argument
+  my $solutionString = $args{'solutionString'};
+  # string from students exam file, which was provided as argument
+  my $studentString = $args{'studentString'};
+  # store the length of the original string from the solution file
+  my $lengthOriginalString = length($solutionString);
+  # calculate the edit-distance of the two strings
+  my $editDistance = distance($solutionString, $studentString);
+  # calculate the edit-distance in percent
+  my $editDistancePercent = ($editDistance / $lengthOriginalString) * 100;
+  say "Length: $lengthOriginalString Distance: $editDistance";
+  return $editDistancePercent;
 }

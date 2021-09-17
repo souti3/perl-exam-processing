@@ -92,7 +92,7 @@ my @scores;
 # flag to detect whether manual intervention is needed
 my $problemsDetected = 0;
 
-# Print out a title
+# Print a title
 say "\n________________________________________________________________________\n";
 say "Problems which need manual intervention:\n";
 
@@ -132,6 +132,8 @@ for my $examFile (@studentFiles) {
 
   # iterate through the questions of the solution file
   while (my $nextQuestion = each %solutionQandA) {
+    # variable to store the inexact question
+    my $inexactQuestion;
     # check whether the question exists in the exam file
     if (exists $studentsQandA{$nextQuestion}) {
       # set the flag that the question exists to 1
@@ -158,6 +160,7 @@ for my $examFile (@studentFiles) {
         say "Used this instead: $minimumKey";
         # set the flag that the question exists to 1
         $questionExists = 1;
+        $inexactQuestion = $minimumKey;
       }
       else {
         # The question is missing in students exam file
@@ -197,6 +200,9 @@ for my $examFile (@studentFiles) {
         # check whether the answer exists in students exam file
         if ( grep(/$answerText/, @{$studentsQandA{$nextQuestion}}) ) {
           # answer exists, everything ok
+        }
+        elsif ( defined $inexactQuestion && grep(/$answerText/, @{$studentsQandA{$inexactQuestion}}) ) {
+          # answer exists with inexact matching
         }
         else {
           # answer is missing in students exam file
@@ -268,11 +274,6 @@ for my $examScore (@scores) {
 }
 say "\n________________________________________________________________________\n";
 
-# test edit distance
-my $string1 = "Hello from Marcel and Welcome to Perl";
-my $string2 = "Hallo von Marcel and Welcome to Perl";
-my $dist = getEditDistanceInPercent(solutionString=>$string1, studentString=>$string2);
-say "Distance is: $dist";
 
 ##########################################################
 #

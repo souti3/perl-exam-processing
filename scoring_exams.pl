@@ -81,6 +81,13 @@ my %solutionQandA = writeQandAinHash(fileHandle=>$solutionfh);
 # array to store the score of the exam
 my @scores;
 
+# flag to detect whether manual intervention is needed
+my $problemsDetected = 0;
+
+# Print out a title
+say "\n________________________________________________________________________\n";
+say "Problems which need manual intervention:\n";
+
 # iterate through the provided exam files from students
 for my $examFile (@studentFiles) {
   # check whether the files are valid with file test operators
@@ -147,6 +154,8 @@ for my $examFile (@studentFiles) {
           # answer is missing in students exam file
           say "$examFile:";
           say "\t Missing answer: $answerText";
+          # update the problems detected flag
+          $problemsDetected = 1;
         }
       }
 
@@ -182,6 +191,8 @@ for my $examFile (@studentFiles) {
       # The question is missing in students exam file
       say "$examFile:";
       say "\t Missing question: $nextQuestion";
+      # update the problems detected flag
+      $problemsDetected = 1;
     }
     # increase the number of questions by one
     $numberOfQuestions++;
@@ -202,14 +213,20 @@ for my $examFile (@studentFiles) {
 # close the solution file
 close $solutionfh or die $!;
 
-#say Dumper %solutionQandA;
+# check whether there are any problems or not
+if ($problemsDetected == 0) {
+  say "No problems detected within the provided files!\n";
+}
 
-say "The evaluation of the exams showed the following scores:";
+#say Dumper %solutionQandA;
+say "\n________________________________________________________________________\n";
+say "The evaluation of the exams showed the following scores:\n";
 
 # print the scores for each exam file
 for my $examScore (@scores) {
   say $examScore;
 }
+say "\n________________________________________________________________________\n";
 
 ##########################################################
 #

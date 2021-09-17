@@ -359,6 +359,18 @@ sub getNormalizedString ( %args ) {
   return $noStopWords;
 }
 
+##########################################################
+#
+# Gets two strings as arguments. One is the original
+# string from the solution file and the other is the
+# normalized string from students exam files.
+# The subroutine stores the length of the original
+# string, calculates the edit-distance of both strings
+# and calculates the deviation between the original
+# and the normalized string in percent.
+# Returns the deviation of both strings in percent.
+#
+##########################################################
 sub getEditDistanceInPercent ( %args ) {
   # string from solution file, which was provided as argument
   my $solutionString = $args{'solutionString'};

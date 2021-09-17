@@ -126,14 +126,14 @@ for my $examFile (@studentFiles) {
   # iterate through the questions of the solution file
   while (my $nextQuestion = each %solutionQandA) {
     # check whether the question exists in the exam file
-    if (exists $studentsQandA{$nextQuestion}){
+    if (exists $studentsQandA{$nextQuestion}) {
       ##########################################################
       # compare the answers
       ##########################################################
       # string which will hold the correct answer
       my $correctAnswer = "";
       # regex which matches an answer which is marked as correct
-      my $matchMarkedAnswers = qr{^\s*\[\s*X\s*\]\s*}xms;
+      my $matchMarkedAnswers = qr{^\s*\[\s*x\s*\]\s*}xms;
       # count the number of answers which are marked as correct
       my $numMarkedAsCorrect = 0;
       # Loop through the answers in the solution file
@@ -231,12 +231,6 @@ for my $examScore (@scores) {
 }
 say "\n________________________________________________________________________\n";
 
-# test the normalization
-my $testString = "   What is the    airspeed of a fully laden African swallow?  ";
-say $testString;
-my $normalizedString = getNormalizedString(string=>$testString);
-say $normalizedString;
-
 ##########################################################
 #
 # Gets a file handle as argument. This file handle
@@ -284,6 +278,8 @@ sub writeQandAinHash ( %args ) {
 
     # if nextline is an answer, but not an example answer
     if ($nextline =~ $matchAnswer && $nextline !~ $matchExampleAnswers) {
+      # normalization of the answer
+      $nextline = getNormalizedString(string=>$nextline);
       # add the answer into the answer array.
       push @answers, $nextline;
     }
@@ -291,6 +287,8 @@ sub writeQandAinHash ( %args ) {
 
     # if $nextline is a question
     if ($nextline =~ $matchQuestion) {
+      # normalization of the question
+      $nextline = getNormalizedString(string=>$nextline);
       # save the question
       $currentQuestion = $nextline;
     }
@@ -316,7 +314,7 @@ sub removeCheckbox ( %args ) {
   # String with a checkbox which was provided as argument
   my $string = $args{'string'};
   # use split function to remove the checkbox in front of the answer
-  my @splittedString = split(/\s*\[(?:\s*|X\s*)\]\s*/, $string);
+  my @splittedString = split(/\s*\[(?:\s*|x\s*)\]\s*/, $string);
   # the actual answer text is stored as the second element
   my $answerText = $splittedString[1];
   # return the string with the pure text of the answer

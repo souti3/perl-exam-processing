@@ -194,11 +194,25 @@ for my $examFile (@studentFiles) {
 
     }
     else {
-      # The question is missing in students exam file
-      say "$examFile:";
-      say "\t Missing question: $nextQuestion";
-      # update the problems detected flag
-      $problemsDetected = 1;
+      # no exact question match, check whether there is an inexact match
+      for my $studentKey (keys %studentsQandA) {
+        # get the deviation between the original question and the one from the stundent
+        my $deviation = getEditDistanceInPercent(solutionString=>$nextQuestion, studentString=>$studentKey);
+        # if the edit-distance is no more than 10% accept the question
+        if ($deviation <= 10) {
+          # accept question
+          say "$examFile:";
+          say "Missing question: $nextQuestion";
+          say "Used this instead: $studentKey";
+        }
+        else {
+          # The question is missing in students exam file
+          say "$examFile:";
+          say "\t Missing question: $nextQuestion";
+          # update the problems detected flag
+          $problemsDetected = 1;
+        }
+      }
     }
     # increase the number of questions by one
     $numberOfQuestions++;
@@ -382,6 +396,5 @@ sub getEditDistanceInPercent ( %args ) {
   my $editDistance = distance($solutionString, $studentString);
   # calculate the edit-distance in percent
   my $editDistancePercent = ($editDistance / $lengthOriginalString) * 100;
-  say "Length: $lengthOriginalString Distance: $editDistance";
   return $editDistancePercent;
 }

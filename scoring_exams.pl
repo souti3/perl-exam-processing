@@ -10,6 +10,9 @@ use Data::Dumper 'Dumper';
 # load the self written perl module
 use Utility::Filechecks;
 
+# used to remove stop words from texts
+use Lingua::EN::StopWords qw(%StopWords);
+
 ##########################################################
 # read the arguments from command-line, verify that the
 # correct number of arguments are provided and store them
@@ -228,6 +231,12 @@ for my $examScore (@scores) {
 }
 say "\n________________________________________________________________________\n";
 
+# test the normalization
+my $testString = "   What is the    airspeed of a fully laden African swallow?  ";
+say $testString;
+my $normalizedString = getNormalizedString(string=>$testString);
+say $normalizedString;
+
 ##########################################################
 #
 # Gets a file handle as argument. This file handle
@@ -300,7 +309,7 @@ sub writeQandAinHash ( %args ) {
 # This answer string was read from an exam file and
 # contains a checkbox in front of the answer text.
 # This subroutine removes the checkbox from the string.
-# Returns the pure text of the answer as a String.
+# Returns the pure text of the answer as a string.
 #
 ##########################################################
 sub removeCheckbox ( %args ) {
@@ -312,4 +321,33 @@ sub removeCheckbox ( %args ) {
   my $answerText = $splittedString[1];
   # return the string with the pure text of the answer
   return $answerText;
+}
+
+##########################################################
+#
+# Gets a string as argument.
+# This string will then be normalized within this
+# subroutine. The normalization consists of the following:
+# - converting the text to lower-case
+# - removing any "stop words" from the text
+# - removing whitespace characters at the start and/or the end of the text
+# - replacing whitespace characters within the text with a single space character.
+# Returns the normalized string.
+#
+##########################################################
+sub getNormalizedString ( %args ) {
+  # string which was provided as argument
+  my $inputString = $args{'string'};
+  # convert the text to lower case
+  $inputString = lc($inputString);
+  # use split function to add the words of the string into an array
+  my @wordsOfString = split(/\s+/, $inputString);
+  # Remove stop words from @wordsOfString and add them to a new variable
+  my $noStopWords =  sprintf join " ", grep { !$StopWords{$_} } @wordsOfString;
+  # remove whitespaces at the start and/or the end of the text
+  $noStopWords =~ s/^\s+|\s+$//g;
+  # remove whitespace characters within the text with single space
+  $noStopWords =~ s/\s+/ /g;
+  # return the normalized string
+  return $noStopWords;
 }

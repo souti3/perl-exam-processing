@@ -16,6 +16,9 @@ use Lingua::EN::StopWords qw(%StopWords);
 # used to calculate the Levenshtein edit distance between two strings
 use Text::Levenshtein qw(distance);
 
+# used to find the minimum value in a hash
+use List::Util qw(reduce);
+
 ##########################################################
 # read the arguments from command-line, verify that the
 # correct number of arguments are provided and store them
@@ -77,7 +80,6 @@ else {
 # Using the module Filechecks.pm
 inputcheck($solutionFile);
 
-
 # open the solution file
 open (my $solutionfh, $solutionFile) or die $!;
 
@@ -125,11 +127,51 @@ for my $examFile (@studentFiles) {
   my $score = 0;
   # count the total number of questions
   my $numberOfQuestions = 0;
+  # flag to indicate whether a question exists
+  my $questionExists = 0;
 
   # iterate through the questions of the solution file
   while (my $nextQuestion = each %solutionQandA) {
     # check whether the question exists in the exam file
     if (exists $studentsQandA{$nextQuestion}) {
+      # set the flag that the question exists to 1
+      $questionExists = 1;
+    }
+    else {
+      my %deviationHash;
+      # no exact question match, check whether there is an inexact match
+      for my $studentKey (keys %studentsQandA) {
+        # get the deviation between the original question and the one from the stundent
+        my $deviation = getEditDistanceInPercent(solutionString=>$nextQuestion, studentString=>$studentKey);
+        $deviationHash{$studentKey} = $deviation;
+
+      }
+      # find the key with the lowest value for deviation
+      my $minimumKey = reduce { $deviationHash{$a} <= $deviationHash{$b} ? $a : $b } keys %deviationHash;
+      # store the minimum deviation
+      my $minimumVal = $deviationHash{$minimumKey};
+      # if the edit-distance is no more than 10% accept the question
+      if ($minimumVal <= 10) {
+        # accept question
+        say "$examFile:";
+        say "Missing question: $nextQuestion";
+        say "Used this instead: $minimumKey";
+        # set the flag that the question exists to 1
+        $questionExists = 1;
+      }
+      else {
+        # The question is missing in students exam file
+        say "$examFile:";
+        say "\t Missing question: $nextQuestion";
+        # update the problems detected flag
+        $problemsDetected = 1;
+        # set the flag that the question exists to 0
+        $questionExists = 0;
+      }
+    }
+
+    # if the question exists continue with the comparison of the answers
+    if ($questionExists == 1) {
       ##########################################################
       # compare the answers
       ##########################################################
@@ -191,28 +233,6 @@ for my $examFile (@studentFiles) {
       }
       # set the counter back to zero for the next question
       $numMarkedAsCorrect = 0;
-
-    }
-    else {
-      # no exact question match, check whether there is an inexact match
-      for my $studentKey (keys %studentsQandA) {
-        # get the deviation between the original question and the one from the stundent
-        my $deviation = getEditDistanceInPercent(solutionString=>$nextQuestion, studentString=>$studentKey);
-        # if the edit-distance is no more than 10% accept the question
-        if ($deviation <= 10) {
-          # accept question
-          say "$examFile:";
-          say "Missing question: $nextQuestion";
-          say "Used this instead: $studentKey";
-        }
-        else {
-          # The question is missing in students exam file
-          say "$examFile:";
-          say "\t Missing question: $nextQuestion";
-          # update the problems detected flag
-          $problemsDetected = 1;
-        }
-      }
     }
     # increase the number of questions by one
     $numberOfQuestions++;
